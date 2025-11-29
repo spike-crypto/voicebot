@@ -17,4 +17,4 @@ jobs:
       - name: Push to hub
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: git push https://hf_user:$HF_TOKEN@huggingface.co/spaces/viperlurk/VoiceBot main
+        run: git push --force https://hf_user:$HF_TOKEN@huggingface.co/spaces/viperlurk/VoiceBot main
