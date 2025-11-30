@@ -17,7 +17,7 @@ A modern, production-ready voice-to-voice interview bot built with React fronten
 
 - **Frontend**: React 18 + Vite (Port 3000)
 - **Backend**: Flask 3.0 + Flask-SocketIO (Port 5000)
-- **AI Services**: Whisper (STT), Groq/OpenAI (LLM), gTTS (TTS)
+- **AI Services**: Whisper (STT), Groq/OpenAI (LLM), YourTTS (TTS)
 - **Storage**: Redis (optional) or in-memory cache
 - **WebSocket**: Real-time bidirectional communication
 

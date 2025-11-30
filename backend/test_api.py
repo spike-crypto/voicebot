@@ -6,7 +6,7 @@ import json
 import time
 from pathlib import Path
 
-BASE_URL = "http://localhost:5000"
+BASE_URL = "http://localhost:5001"
 API_URL = f"{BASE_URL}/api"
 
 def print_header(text):
@@ -89,7 +89,7 @@ def test_tts():
     print_header("Test 4: Text-to-Speech")
     try:
         payload = {"text": "Hello, this is a test."}
-        response = requests.post(f"{API_URL}/tts", json=payload, timeout=10)
+        response = requests.post(f"{API_URL}/tts", json=payload, timeout=60)
         
         if response.status_code == 200:
             # Check if we got audio data

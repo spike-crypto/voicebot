@@ -10,26 +10,6 @@ print("=" * 60)
 print("CONFIGURATION DIAGNOSTIC")
 print("=" * 60)
 
-# ElevenLabs Keys
-print("\n📢 ELEVENLABS CONFIGURATION:")
-primary = os.environ.get('ELEVENLABS_API_KEY')
-backup1 = os.environ.get('ELEVENLABS_API_KEY_BACKUP_1')
-backup2 = os.environ.get('ELEVENLABS_API_KEY_BACKUP_2')
-voice_id = os.environ.get('ELEVENLABS_VOICE_ID')
-
-print(f"Primary Key: {'✅ SET' if primary else '❌ NOT SET'} ({primary[:20] + '...' if primary else 'None'})")
-print(f"Backup Key 1: {'✅ SET' if backup1 else '❌ NOT SET'} ({backup1[:20] + '...' if backup1 else 'None'})")
-print(f"Backup Key 2: {'✅ SET' if backup2 else '❌ NOT SET'} ({backup2[:20] + '...' if backup2 else 'None'})")
-print(f"Voice ID: {voice_id or 'NOT SET (will use default)'}")
-
-# Check voice ID
-if voice_id == 'ErXwobaYiN019PkySvjV':
-    print("✅ Voice is set to Antoni (MALE)")
-elif voice_id == '21m00Tcm4TlvDq8ikWAM':
-    print("❌ Voice is set to Rachel (FEMALE) - WRONG!")
-else:
-    print(f"⚠️ Unknown voice ID: {voice_id}")
-
 # Mistral Keys
 print("\n🤖 MISTRAL CONFIGURATION:")
 mistral_key = os.environ.get('MISTRAL_API_KEY')
@@ -51,12 +31,6 @@ print("\n" + "=" * 60)
 print("RECOMMENDATIONS:")
 print("=" * 60)
 
-if not backup1:
-    print("❌ Add ELEVENLABS_API_KEY_BACKUP_1 to .env")
-if not backup2:
-    print("❌ Add ELEVENLABS_API_KEY_BACKUP_2 to .env")
-if voice_id != 'ErXwobaYiN019PkySvjV':
-    print("❌ Set ELEVENLABS_VOICE_ID=ErXwobaYiN019PkySvjV in .env for male voice")
 if not mistral_key:
     print("❌ Add MISTRAL_API_KEY to .env")
 

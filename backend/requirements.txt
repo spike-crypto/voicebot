@@ -9,4 +9,5 @@ python-socketio==5.11.0
 # eventlet==0.33.3  # Not compatible with Python 3.12, using threading mode instead
 Werkzeug==3.0.1
 requests>=2.28.0
+coqui-tts>=0.0.1
 

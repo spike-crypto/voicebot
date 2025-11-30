@@ -48,6 +48,7 @@ Thumbs.db
 *.mp3
 *.wav
 *.ogg
+!assets/*.mp3
 
 # Log files (optional - uncomment if you don't want to track logs)
 # logs/

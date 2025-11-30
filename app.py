@@ -1,7 +1,7 @@
 import os
 import gradio as gr
 import whisper
-from gtts import gTTS
+# from gtts import gTTS
 import io
 from groq import Groq
 import tempfile
@@ -155,23 +155,46 @@ def process_audio(audio_file):
         messages.append({"role": "assistant", "content": response_text})
         logger.info(f"Assistant response added to conversation history (Total messages: {len(messages)})")
         
-        # Step 3: Convert response to speech (gTTS)
-        logger.info("Step 3: Converting response to speech with gTTS...")
+        # Step 3: Convert response to speech (YourTTS)
+        logger.info("Step 3: Converting response to speech with YourTTS...")
         start_time = datetime.now()
         
-        tts = gTTS(text=response_text, lang='en', slow=False)
-        audio_buffer = io.BytesIO()
-        tts.write_to_fp(audio_buffer)
-        audio_buffer.seek(0)
+        # Initialize TTS (lazy load)
+        global tts_model
+        if 'tts_model' not in globals():
+            logger.info("Initializing YourTTS model...")
+            try:
+                from TTS.api import TTS
+                # Use GPU if available
+                import torch
+                use_gpu = torch.cuda.is_available()
+                tts_model = TTS("tts_models/multilingual/multi-dataset/your_tts", gpu=use_gpu)
+                logger.info(f"YourTTS model loaded (GPU: {use_gpu})")
+            except Exception as e:
+                logger.error(f"Failed to load YourTTS: {e}")
+                raise
+
+        # Generate audio to file
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_audio:
+            temp_audio_path = temp_audio.name
+            
+        # Reference audio path
+        ref_audio = os.path.join("assets", "reference_voice.mp3")
+        if not os.path.exists(ref_audio):
+            logger.warning(f"Reference audio not found at {ref_audio}, using default voice")
+            # YourTTS requires a speaker, so if missing, we might fail or need a fallback
+            # For now, let's assume it exists as per instructions
+            raise FileNotFoundError(f"Reference audio not found at {ref_audio}")
+
+        tts_model.tts_to_file(
+            text=response_text, 
+            file_path=temp_audio_path,
+            speaker_wav=ref_audio,
+            language="en"
+        )
         
         tts_time = (datetime.now() - start_time).total_seconds()
         logger.info(f"TTS conversion completed in {tts_time:.2f} seconds")
-        
-        # Save to temp file for Gradio (required for playback)
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as temp_audio:
-            temp_audio.write(audio_buffer.getvalue())
-            temp_audio_path = temp_audio.name
-        
         logger.info(f"Audio file saved to: {temp_audio_path}")
         
         # Step 4: Update chat display

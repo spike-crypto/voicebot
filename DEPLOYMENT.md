@@ -32,6 +32,7 @@ You can upload files in two ways:
    - `app.py`
    - `requirements.txt`
    - `README.md`
+   - `assets/` folder (Critical: contains reference voice)
 
 #### Option B: Git (Recommended for updates)
 
@@ -132,6 +133,29 @@ You can upload files in two ways:
 2. Edit the `GROQ_API_KEY` secret
 3. Save changes
 4. Restart the Space (Settings → Restart this Space)
+
+## Continuous Deployment (GitHub Actions)
+
+The project includes a GitHub Action to automatically sync changes to Hugging Face.
+
+### Setup
+1. **Get Hugging Face Token**:
+   - Go to [Hugging Face Settings > Tokens](https://huggingface.co/settings/tokens)
+   - Create a new token with **Write** permissions.
+
+2. **Configure GitHub Secrets**:
+   - Go to your GitHub Repo > Settings > Secrets and variables > Actions
+   - Click **New repository secret**
+   - Name: `HF_TOKEN`
+   - Value: (Paste your Hugging Face token)
+
+3. **Update Workflow File**:
+   - Open `.github/workflows/sync_to_hub.yml`
+   - Update the URL in the last line to match your Space:
+     `https://hf_user:$HF_TOKEN@huggingface.co/spaces/[YOUR_USERNAME]/[YOUR_SPACE_NAME]`
+
+4. **Push to GitHub**:
+   - Any push to `main` will now automatically deploy to Hugging Face!
 
 ## Space Settings
 

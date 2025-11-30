@@ -1,0 +1,20 @@
+﻿Γ£ô Loaded .env from: D:\Projects\Portfolio agent\backend\.env
+
+≡ƒÄñ XTTS-v2 Text-to-Speech Test Suite
+
+============================================================
+Testing Coqui XTTS-v2 via Hugging Face Inference API
+============================================================
+Γ¥î ERROR: HUGGINGFACE_API_TOKEN not found in .env file
+
+============================================================
+Testing XTTS-v2 with Voice Cloning (Advanced)
+============================================================
+ΓÜá∩╕Å  Skipping voice cloning test - no reference audio found
+≡ƒÆí To test voice cloning, add a 6-second audio file as 'reference_voice.wav'
+
+============================================================
+ΓÜá∩╕Å  TESTS INCOMPLETE
+≡ƒÆí Check the errors above and try again
+============================================================
+

@@ -1,6 +1,6 @@
 gradio>=4.0.0
 groq>=0.4.0
 openai-whisper
-gtts>=2.3.0
+coqui-tts>=0.0.1
 python-dotenv>=1.0.0
 

@@ -4,10 +4,8 @@ Simple provider connectivity checks for this project.
 
 This script checks:
 - Hugging Face Inference API (model metadata endpoint)
-- ElevenLabs API (voices endpoint)
 - OpenAI API (models list)
 - Groq presence (basic import + API key check)
-- gTTS local conversion
 - Whisper import and ffmpeg availability
 
 Usage: run from repository root or backend directory so dotenv loads correctly.
@@ -20,7 +18,6 @@ PowerShell example:
 Note: This script performs live network calls and requires the appropriate
 API keys present in `backend/.env` or the environment:
 - HUGGINGFACE_API_TOKEN
-- ELEVENLABS_API_KEY
 - OPENAI_API_KEY
 - GROQ_API_KEY (optional)
 
@@ -106,32 +103,6 @@ def check_huggingface(model=None):
         return False
 
 
-def check_elevenlabs():
-    key = os.environ.get('ELEVENLABS_API_KEY')
-    if not key:
-        fail('ElevenLabs: ELEVENLABS_API_KEY not set')
-        return False
-
-    url = 'https://api.elevenlabs.io/v1/voices'
-    headers = {'xi-api-key': key}
-    try:
-        resp = requests.get(url, headers=headers, timeout=20)
-        if resp.status_code == 200:
-            try:
-                data = resp.json()
-                voices = data.get('voices') if isinstance(data, dict) else None
-                ok(f'ElevenLabs reachable, voices returned: {len(voices) if voices else "unknown"}')
-            except Exception:
-                ok('ElevenLabs reachable (response not JSON)')
-            return True
-        else:
-            fail(f'ElevenLabs responded {resp.status_code}: {resp.text[:200]}')
-            return False
-    except Exception as e:
-        fail(f'ElevenLabs request error: {e}')
-        return False
-
-
 def check_openai():
     key = os.environ.get('OPENAI_API_KEY')
     if not key:
@@ -167,27 +138,6 @@ def check_groq():
         return False
 
 
-def check_gtts():
-    try:
-        from gtts import gTTS
-        sample_text = 'This is a quick test.'
-        upload_folder = os.environ.get('UPLOAD_FOLDER', str(HERE / 'uploads'))
-        os.makedirs(upload_folder, exist_ok=True)
-        out_path = Path(upload_folder) / 'test_gtts.mp3'
-        tts = gTTS(text=sample_text, lang='en')
-        with open(out_path, 'wb') as f:
-            tts.write_to_fp(f)
-        if out_path.exists() and out_path.stat().st_size > 0:
-            ok(f'gTTS produced audio at {out_path}')
-            return True
-        else:
-            fail('gTTS produced an empty file')
-            return False
-    except Exception as e:
-        fail(f'gTTS test failed: {e}')
-        return False
-
-
 def check_whisper_ffmpeg():
     try:
         import whisper
@@ -207,10 +157,8 @@ def main():
     results = {}
 
     results['huggingface'] = check_huggingface()
-    results['elevenlabs'] = check_elevenlabs()
     results['openai'] = check_openai()
     results['groq'] = check_groq()
-    results['gtts'] = check_gtts()
     results['whisper_ffmpeg'] = check_whisper_ffmpeg()
 
     print('\nSummary:')

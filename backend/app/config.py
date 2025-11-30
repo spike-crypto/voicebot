@@ -9,29 +9,6 @@ load_dotenv()
 
 class Config:
     """Base configuration"""
-    # Flask settings
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
-    
-    # API Keys
-    GROQ_API_KEY = os.environ.get('GROQ_API_KEY')
-    OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
-    ELEVENLABS_API_KEY = os.environ.get('ELEVENLABS_API_KEY')
-    ELEVENLABS_API_KEY_BACKUP_1 = os.environ.get('ELEVENLABS_API_KEY_BACKUP_1')
-    ELEVENLABS_API_KEY_BACKUP_2 = os.environ.get('ELEVENLABS_API_KEY_BACKUP_2')
-    # Hugging Face and provider selection
-    HUGGINGFACE_API_TOKEN = os.environ.get('HUGGINGFACE_API_TOKEN')
-    HUGGINGFACE_API_BASE = os.environ.get('HUGGINGFACE_API_BASE', 'https://router.huggingface.co')
-    STT_PROVIDER = os.environ.get('STT_PROVIDER', 'elevenlabs')  # Default to ElevenLabs Scribe
-    TTS_PROVIDER = os.environ.get('TTS_PROVIDER', 'elevenlabs') # Default to ElevenLabs
-    HUGGINGFACE_STT_MODEL = os.environ.get('HUGGINGFACE_STT_MODEL', 'openai/whisper-large-v3')
-    ELEVENLABS_VOICE_ID = os.environ.get('ELEVENLABS_VOICE_ID', 'ErXwobaYiN019PkySvjV')  # Antoni - male voice
-    ELEVENLABS_STT_MODEL = os.environ.get('ELEVENLABS_STT_MODEL', 'scribe_v1')
-    
-    # Model Configuration
-    WHISPER_MODEL = os.environ.get('WHISPER_MODEL', 'base')
-    # GROQ_MODEL = os.environ.get('GROQ_MODEL', 'llama-3.1-8b-instant')
-    GROQ_MODEL = 'llama-3.3-70b-versatile' # Force valid model
-    OPENAI_MODEL = os.environ.get('OPENAI_MODEL', 'gpt-3.5-turbo')
     
     # LLM Parameters
     LLM_TEMPERATURE = float(os.environ.get('LLM_TEMPERATURE', '0.7'))
