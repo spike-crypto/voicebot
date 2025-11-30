@@ -273,13 +273,51 @@ def _call_mistral(conversation_history: List[Dict]) -> Tuple[str, Dict]:
     return text.strip(), metadata
 
 
+def _call_groq(conversation_history: List[Dict]) -> Tuple[str, Dict]:
+    """Call Groq API as fallback.
+    
+    Returns (response_text, metadata)
+    """
+    api_key = current_app.config.get('GROQ_API_KEY')
+    if not api_key:
+        raise RuntimeError('Groq API key not configured')
+    
+    try:
+        from groq import Groq
+        client = Groq(api_key=api_key)
+        
+        # Prepare messages
+        messages = [{'role': 'system', 'content': SYSTEM_PROMPT}]
+        for msg in conversation_history:
+            if msg.get('role') in ['user', 'assistant']:
+                messages.append({
+                    'role': msg['role'],
+                    'content': msg['content']
+                })
+        
+        # Call Groq API
+        response = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=messages,
+            temperature=float(current_app.config.get('LLM_TEMPERATURE', 0.7)),
+            max_tokens=int(current_app.config.get('LLM_MAX_TOKENS', 100))
+        )
+        
+        text = response.choices[0].message.content.strip()
+        metadata = {'provider': 'groq', 'model': 'llama-3.3-70b-versatile'}
+        return text, metadata
+        
+    except Exception as e:
+        raise RuntimeError(f"Groq API call failed: {str(e)}")
+
+
 def generate_response(
     conversation_history: List[Dict],
     use_cache: bool = True,
     provider: Optional[str] = None
 ) -> Tuple[str, Dict, bool]:
     """
-    Generate response using Mistral LLM ONLY
+    Generate response using Mistral LLM with Groq fallback
     
     Args:
         conversation_history: List of conversation messages
@@ -312,6 +350,7 @@ def generate_response(
     # Prepare messages
     messages = _prepare_messages(conversation_history)
     
+    # Try Mistral first
     try:
         response_text, meta = _call_mistral(messages)
         metadata.update(meta)
@@ -319,9 +358,23 @@ def generate_response(
         metadata['tokens_used'] = 0
         if use_cache:
             set_cache(cache_key, {'response': response_text, 'metadata': metadata}, ttl=3600)
-        logger.info(f"Response generated using mistral: '{response_text[:50]}...'")
+        logger.info(f"Response generated using Mistral: '{response_text[:50]}...'")
         return response_text, metadata, cache_hit
-    except Exception as e:
-        logger.error(f"Mistral provider failed: {e}")
-        raise Exception(f"Mistral LLM provider failed: {str(e)}")
+    except Exception as mistral_error:
+        logger.warning(f"Mistral provider failed: {mistral_error}")
+        logger.info("Falling back to Groq...")
+        
+        # Fallback to Groq
+        try:
+            response_text, meta = _call_groq(messages)
+            metadata.update(meta)
+            metadata['provider'] = 'groq'
+            metadata['tokens_used'] = 0
+            if use_cache:
+                set_cache(cache_key, {'response': response_text, 'metadata': metadata}, ttl=3600)
+            logger.info(f"Response generated using Groq (fallback): '{response_text[:50]}...'")
+            return response_text, metadata, cache_hit
+        except Exception as groq_error:
+            logger.error(f"Groq fallback also failed: {groq_error}")
+            raise Exception(f"Both LLM providers failed. Mistral: {str(mistral_error)}, Groq: {str(groq_error)}")
 
